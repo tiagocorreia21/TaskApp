@@ -13,6 +13,10 @@ Write-Host ""
 
 $ErrorActionPreference = "Stop"
 
+# Obter o diretório raiz do projeto e salvar diretório atual
+$ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$OriginalLocation = Get-Location
+
 # Função para verificar se um comando existe
 function Test-CommandExists {
     param($command)
@@ -46,8 +50,6 @@ Write-Host "Configurando PATH do Node.js: $nodeDir" -ForegroundColor Yellow
 $env:PATH = "$nodeDir;$env:PATH"
 Write-Host ""
 
-# Obter o diretório raiz do projeto
-$ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $BackendPath = Join-Path $ProjectRoot "backend"
 $FrontendPath = Join-Path $ProjectRoot "frontend"
 
@@ -67,6 +69,7 @@ Write-Host "Instalando dependências do backend..." -ForegroundColor Yellow
 npm install
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERRO: Falha ao instalar dependências do backend!" -ForegroundColor Red
+    Set-Location $OriginalLocation
     exit 1
 }
 Write-Host "✓ Dependências do backend instaladas com sucesso!" -ForegroundColor Green
@@ -131,6 +134,7 @@ Write-Host "Compilando TypeScript do backend..." -ForegroundColor Yellow
 npm run build
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERRO: Falha ao compilar o backend!" -ForegroundColor Red
+    Set-Location $OriginalLocation
     exit 1
 }
 Write-Host "✓ Backend compilado com sucesso!" -ForegroundColor Green
@@ -144,6 +148,7 @@ Write-Host ""
 
 if (-not (Test-Path $FrontendPath)) {
     Write-Host "ERRO: Diretório frontend não encontrado!" -ForegroundColor Red
+    Set-Location $OriginalLocation
     exit 1
 }
 
@@ -152,6 +157,7 @@ Write-Host "Instalando dependências do frontend..." -ForegroundColor Yellow
 npm install
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERRO: Falha ao instalar dependências do frontend!" -ForegroundColor Red
+    Set-Location $OriginalLocation
     exit 1
 }
 Write-Host "✓ Dependências do frontend instaladas com sucesso!" -ForegroundColor Green
@@ -161,13 +167,14 @@ Write-Host "Compilando frontend..." -ForegroundColor Yellow
 npm run build
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERRO: Falha ao compilar o frontend!" -ForegroundColor Red
+    Set-Location $OriginalLocation
     exit 1
 }
 Write-Host "✓ Frontend compilado com sucesso!" -ForegroundColor Green
 Write-Host ""
 
-# Voltar ao diretório raiz
-Set-Location $ProjectRoot
+# Voltar ao diretório original
+Set-Location $OriginalLocation
 
 Write-Host "========================================" -ForegroundColor Green
 Write-Host "  Deploy concluído com sucesso!        " -ForegroundColor Green

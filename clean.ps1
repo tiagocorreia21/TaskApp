@@ -12,6 +12,9 @@ Write-Host "  • Arquivos compilados (build, dist)" -ForegroundColor Yellow
 Write-Host "  • package-lock.json" -ForegroundColor Yellow
 Write-Host ""
 
+# Obter o diretório raiz do projeto
+$ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+
 # Função para remover diretório com mensagem
 function Remove-DirectoryWithMessage {
     param(
@@ -58,9 +61,9 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
 # Remover node_modules
-Remove-DirectoryWithMessage -Path ".\node_modules" -Description "node_modules (root)"
-Remove-DirectoryWithMessage -Path ".\backend\node_modules" -Description "node_modules (backend)"
-Remove-DirectoryWithMessage -Path ".\frontend\node_modules" -Description "node_modules (frontend)"
+Remove-DirectoryWithMessage -Path (Join-Path $ProjectRoot "node_modules") -Description "node_modules (root)"
+Remove-DirectoryWithMessage -Path (Join-Path $ProjectRoot "backend\node_modules") -Description "node_modules (backend)"
+Remove-DirectoryWithMessage -Path (Join-Path $ProjectRoot "frontend\node_modules") -Description "node_modules (frontend)"
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
@@ -69,8 +72,8 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
 # Remover arquivos compilados
-Remove-DirectoryWithMessage -Path ".\backend\build" -Description "build (backend)"
-Remove-DirectoryWithMessage -Path ".\frontend\dist" -Description "dist (frontend)"
+Remove-DirectoryWithMessage -Path (Join-Path $ProjectRoot "backend\build") -Description "build (backend)"
+Remove-DirectoryWithMessage -Path (Join-Path $ProjectRoot "frontend\dist") -Description "dist (frontend)"
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
@@ -79,9 +82,9 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
 # Remover package-lock.json
-Remove-FileWithMessage -Path ".\package-lock.json" -Description "package-lock.json (root)"
-Remove-FileWithMessage -Path ".\backend\package-lock.json" -Description "package-lock.json (backend)"
-Remove-FileWithMessage -Path ".\frontend\package-lock.json" -Description "package-lock.json (frontend)"
+Remove-FileWithMessage -Path (Join-Path $ProjectRoot "package-lock.json") -Description "package-lock.json (root)"
+Remove-FileWithMessage -Path (Join-Path $ProjectRoot "backend\package-lock.json") -Description "package-lock.json (backend)"
+Remove-FileWithMessage -Path (Join-Path $ProjectRoot "frontend\package-lock.json") -Description "package-lock.json (frontend)"
 
 Write-Host ""
 Write-Host "╔════════════════════════════════════════╗" -ForegroundColor Green

@@ -10,21 +10,23 @@ Write-Host ""
 
 $ErrorActionPreference = "Stop"
 
-# Obter o diretório raiz do projeto
+# Obter o diretório raiz do projeto e salvar diretório atual
 $ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$OriginalLocation = Get-Location
 $BackendPath = Join-Path $ProjectRoot "backend"
 $MongoDBBinariesPath = Join-Path $BackendPath "mongodb-binaries"
 
 # Verificar se o backend existe
 if (-not (Test-Path $BackendPath)) {
-    Write-Host "❌ ERRO: Diretório backend não encontrado!" -ForegroundColor Red
+    Write-Host "ERRO: Diretório backend não encontrado!" -ForegroundColor Red
+    Set-Location $OriginalLocation
     exit 1
 }
 
 # Verificar se node_modules existe
 $nodeModulesPath = Join-Path $BackendPath "node_modules"
 if (-not (Test-Path $nodeModulesPath)) {
-    Write-Host "❌ ERRO: Dependências do backend não estão instaladas!" -ForegroundColor Red
+    Write-Host "ERRO: Dependências do backend não estão instaladas!" -ForegroundColor Red
     Write-Host ""
     Write-Host "Por favor, execute primeiro:" -ForegroundColor Yellow
     Write-Host "  cd backend" -ForegroundColor Gray
@@ -33,18 +35,20 @@ if (-not (Test-Path $nodeModulesPath)) {
     Write-Host "Ou execute:" -ForegroundColor Yellow
     Write-Host "  .\deploy.ps1" -ForegroundColor Gray
     Write-Host ""
+    Set-Location $OriginalLocation
     exit 1
 }
 
 # Verificar se mongodb-memory-server está instalado
 $mongoMemoryServerPath = Join-Path $nodeModulesPath "mongodb-memory-server"
 if (-not (Test-Path $mongoMemoryServerPath)) {
-    Write-Host "❌ ERRO: mongodb-memory-server não está instalado!" -ForegroundColor Red
+    Write-Host "ERRO: mongodb-memory-server não está instalado!" -ForegroundColor Red
     Write-Host ""
     Write-Host "Execute:" -ForegroundColor Yellow
     Write-Host "  cd backend" -ForegroundColor Gray
     Write-Host "  npm install" -ForegroundColor Gray
     Write-Host ""
+    Set-Location $OriginalLocation
     exit 1
 }
 
@@ -81,6 +85,7 @@ if ($mongoExe) {
         Write-Host "║   ✓ MongoDB já está configurado!      ║" -ForegroundColor Green
         Write-Host "╚════════════════════════════════════════╝" -ForegroundColor Green
         Write-Host ""
+        Set-Location $OriginalLocation
         exit 0
     }
 
@@ -126,7 +131,7 @@ async function downloadMongoDB() {
 
         process.exit(0);
     } catch (error) {
-        console.error('❌ Erro ao baixar MongoDB:', error.message);
+        console.error('Erro ao baixar MongoDB:', error.message);
         process.exit(1);
     }
 }
@@ -159,8 +164,9 @@ try {
     }
 } catch {
     Write-Host ""
-    Write-Host "❌ ERRO: Falha ao baixar MongoDB!" -ForegroundColor Red
+    Write-Host "ERRO: Falha ao baixar MongoDB!" -ForegroundColor Red
     Write-Host "  $($_.Exception.Message)" -ForegroundColor Red
+    Set-Location $OriginalLocation
     exit 1
 } finally {
     # Remover script temporário
@@ -178,5 +184,5 @@ Write-Host "O MongoDB Memory Server está pronto para uso!" -ForegroundColor Cya
 Write-Host "A aplicação usará automaticamente este binário." -ForegroundColor Gray
 Write-Host ""
 
-# Voltar ao diretório raiz
-Set-Location $ProjectRoot
+# Voltar ao diretório original
+Set-Location $OriginalLocation

@@ -14,6 +14,10 @@ Write-Host ""
 
 $ErrorActionPreference = "Stop"
 
+# Obter o diretório raiz do projeto e salvar diretório atual
+$ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$OriginalLocation = Get-Location
+
 # Função para verificar se um comando existe
 function Test-CommandExists {
     param($command)
@@ -31,7 +35,7 @@ Write-Host ""
 # Verificar Node.js
 Write-Host "[1/5] Verificando Node.js..." -ForegroundColor Yellow
 if (-not (Test-CommandExists "node")) {
-    Write-Host "❌ ERRO: Node.js não está instalado!" -ForegroundColor Red
+    Write-Host "ERRO: Node.js não está instalado!" -ForegroundColor Red
     Write-Host ""
     Write-Host "Por favor, instale Node.js de: https://nodejs.org/" -ForegroundColor Yellow
     Write-Host "Recomendado: Node.js LTS (v18 ou superior)" -ForegroundColor Yellow
@@ -44,15 +48,13 @@ Write-Host "✓ Node.js encontrado: $nodeVersion" -ForegroundColor Green
 # Verificar npm
 Write-Host "[2/5] Verificando npm..." -ForegroundColor Yellow
 if (-not (Test-CommandExists "npm")) {
-    Write-Host "❌ ERRO: npm não está instalado!" -ForegroundColor Red
+    Write-Host "ERRO: npm não está instalado!" -ForegroundColor Red
     exit 1
 }
 
 $npmVersion = npm --version
 Write-Host "✓ npm encontrado: v$npmVersion" -ForegroundColor Green
 
-# Obter o diretório raiz do projeto
-$ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 # Instalar dependências do root
 Write-Host "[3/5] Instalando dependências globais do projeto..." -ForegroundColor Yellow
@@ -74,7 +76,7 @@ if (-not $hasConcurrently) {
     if ($LASTEXITCODE -eq 0) {
         Write-Host "✓ concurrently instalado!" -ForegroundColor Green
     } else {
-        Write-Host "⚠ concurrently não instalado globalmente (usará versão local)" -ForegroundColor Yellow
+        Write-Host "concurrently não instalado globalmente (usará versão local)" -ForegroundColor Yellow
     }
 } else {
     Write-Host "✓ concurrently já está disponível" -ForegroundColor Green
@@ -92,9 +94,13 @@ if ($AutoInstallMongoDB) {
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host ""
-    Write-Host "❌ Setup falhou durante o deploy!" -ForegroundColor Red
+    Write-Host "Setup falhou durante o deploy!" -ForegroundColor Red
+    Set-Location $OriginalLocation
     exit 1
 }
+
+# Voltar ao diretório original
+Set-Location $OriginalLocation
 
 # Sucesso!
 Write-Host ""

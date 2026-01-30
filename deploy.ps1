@@ -29,8 +29,17 @@ if (-not (Test-CommandExists "npm")) {
     exit 1
 }
 
-Write-Host "✓ Node.js encontrado: $(node --version)" -ForegroundColor Green
-Write-Host "✓ npm encontrado: $(npm --version)" -ForegroundColor Green
+$nodeVersion = node --version
+$npmVersion = npm --version
+Write-Host "✓ Node.js encontrado: $nodeVersion" -ForegroundColor Green
+Write-Host "✓ npm encontrado: $npmVersion" -ForegroundColor Green
+Write-Host ""
+
+# Obter o caminho do Node.js e adicionar ao PATH para garantir que cmd.exe encontre
+$nodePath = (Get-Command node).Source
+$nodeDir = Split-Path -Parent $nodePath
+Write-Host "Configurando PATH do Node.js: $nodeDir" -ForegroundColor Yellow
+$env:PATH = "$nodeDir;$env:PATH"
 Write-Host ""
 
 # Obter o diretório raiz do projeto
@@ -89,7 +98,7 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "✓ Dependências do frontend instaladas com sucesso!" -ForegroundColor Green
 Write-Host ""
 
-Write-Host "Compilando frontend para produção..." -ForegroundColor Yellow
+Write-Host "Compilando frontend..." -ForegroundColor Yellow
 npm run build
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERRO: Falha ao compilar o frontend!" -ForegroundColor Red

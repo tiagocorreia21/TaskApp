@@ -20,7 +20,6 @@ function Test-CommandExists {
 # Banner de boas-vindas
 Write-Host "Este script irá:" -ForegroundColor Yellow
 Write-Host "  ✓ Verificar pré-requisitos" -ForegroundColor Gray
-Write-Host "  ✓ Instalar concurrently (se necessário)" -ForegroundColor Gray
 Write-Host "  ✓ Executar deploy completo" -ForegroundColor Gray
 Write-Host "  ✓ Preparar aplicação para uso" -ForegroundColor Gray
 Write-Host ""
@@ -111,5 +110,4 @@ Write-Host "Para mais informações, consulte:" -ForegroundColor Cyan
 Write-Host "  • README.md" -ForegroundColor White
 Write-Host "  • SCRIPTS_README.md" -ForegroundColor White
 Write-Host ""
-Write-Host "Bom desenvolvimento! 🚀" -ForegroundColor Green
 Write-Host ""

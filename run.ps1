@@ -68,8 +68,7 @@ function Stop-AllProcesses {
         }
     }
 
-    # Garantir que as portas sejam liberadas
-    Write-Host "Liberando portas..." -ForegroundColor Yellow
+    # Garantir que as portas sejam libertadas
     Get-Process -Name node -ErrorAction SilentlyContinue | Where-Object {
         $_.CommandLine -like "*backend*" -or $_.CommandLine -like "*vite*"
     } | Stop-Process -Force -ErrorAction SilentlyContinue

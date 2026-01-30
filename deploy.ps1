@@ -2,6 +2,10 @@
 # Script para fazer deploy da aplicação (Backend + Frontend)
 # Deploy script for the application (Backend + Frontend)
 
+param(
+    [switch]$AutoInstallMongoDB = $false
+)
+
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "  Deploy TaskApp - Backend + Frontend  " -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
@@ -66,6 +70,61 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 Write-Host "✓ Dependências do backend instaladas com sucesso!" -ForegroundColor Green
+Write-Host ""
+
+# Verificar e preparar MongoDB Memory Server
+Write-Host "Verificando MongoDB Memory Server..." -ForegroundColor Yellow
+$mongodbBinariesPath = Join-Path $BackendPath "mongodb-binaries"
+
+# Criar diretório se não existir
+if (-not (Test-Path $mongodbBinariesPath)) {
+    Write-Host "  Criando diretório para binários do MongoDB..." -ForegroundColor Gray
+    New-Item -ItemType Directory -Path $mongodbBinariesPath -Force | Out-Null
+}
+
+# Verificar se já existe binário do MongoDB
+$mongoExe = Get-ChildItem -Path $mongodbBinariesPath -Filter "mongod-*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+
+if ($mongoExe) {
+    Write-Host "✓ MongoDB binário encontrado: $($mongoExe.Name)" -ForegroundColor Green
+} else {
+    Write-Host "  MongoDB binário não encontrado!" -ForegroundColor Yellow
+
+    $shouldInstall = $false
+
+    if ($AutoInstallMongoDB) {
+        Write-Host "  Modo automático: instalando MongoDB..." -ForegroundColor Cyan
+        $shouldInstall = $true
+    } else {
+        Write-Host "  Deseja baixar o MongoDB agora? (Recomendado)" -ForegroundColor Yellow
+        Write-Host "  (Isso pode demorar alguns minutos na primeira vez)" -ForegroundColor Gray
+        Write-Host ""
+
+        $response = Read-Host "Baixar MongoDB agora? (S/n)"
+        $shouldInstall = ($response -ne 'n' -and $response -ne 'N')
+    }
+
+    if ($shouldInstall) {
+        Write-Host ""
+        Write-Host "  Iniciando download do MongoDB..." -ForegroundColor Cyan
+
+        # Executar script de instalação do MongoDB
+        $installMongoScript = Join-Path $ProjectRoot "install-mongodb.ps1"
+        if (Test-Path $installMongoScript) {
+            & $installMongoScript
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "⚠ Aviso: Falha ao baixar MongoDB" -ForegroundColor Yellow
+                Write-Host "  A aplicação tentará baixar automaticamente na primeira execução" -ForegroundColor Gray
+            }
+        } else {
+            Write-Host "⚠ Script install-mongodb.ps1 não encontrado" -ForegroundColor Yellow
+            Write-Host "  O MongoDB será baixado automaticamente na primeira execução" -ForegroundColor Gray
+        }
+    } else {
+        Write-Host "  MongoDB será baixado automaticamente na primeira execução..." -ForegroundColor Gray
+    }
+}
+
 Write-Host ""
 
 Write-Host "Compilando TypeScript do backend..." -ForegroundColor Yellow

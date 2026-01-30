@@ -2,6 +2,10 @@
 # Script de configuração inicial do projeto TaskApp
 # Initial setup script for TaskApp project
 
+param(
+    [switch]$AutoInstallMongoDB = $false
+)
+
 Write-Host ""
 Write-Host "╔════════════════════════════════════════╗" -ForegroundColor Cyan
 Write-Host "║   TaskApp - Configuração Inicial      ║" -ForegroundColor Cyan
@@ -80,7 +84,11 @@ if (-not $hasConcurrently) {
 Write-Host "[5/5] Executando deploy completo..." -ForegroundColor Yellow
 Write-Host ""
 
-& "$ProjectRoot\deploy.ps1"
+if ($AutoInstallMongoDB) {
+    & "$ProjectRoot\deploy.ps1" -AutoInstallMongoDB
+} else {
+    & "$ProjectRoot\deploy.ps1"
+}
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host ""

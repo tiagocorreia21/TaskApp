@@ -46,7 +46,11 @@ $hasConcurrently = $null -ne (Get-Command concurrently -ErrorAction SilentlyCont
 if (-not $hasConcurrently) {
     Write-Host "AVISO: 'concurrently' não está instalado globalmente" -ForegroundColor Yellow
     Write-Host "Instalando concurrently..." -ForegroundColor Yellow
-    & $nodePath.Node $nodePath.Npm install -g concurrently
+    if ($nodePath.IsLocal) {
+        & $nodePath.Node $nodePath.Npm install -g concurrently
+    } else {
+        npm install -g concurrently
+    }
     if ($LASTEXITCODE -ne 0) {
         Write-Host "ERRO: Falha ao instalar concurrently!" -ForegroundColor Red
         Write-Host "Como alternativa, use: .\run.ps1" -ForegroundColor Yellow

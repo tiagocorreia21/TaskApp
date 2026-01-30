@@ -57,7 +57,11 @@ Write-Host "npm encontrado: v$npmVersion" -ForegroundColor Green
 # Instalar dependências do root
 Write-Host "[3/5] Instalando dependências globais do projeto..." -ForegroundColor Yellow
 Set-Location $ProjectRoot
-& $nodePath.Node $nodePath.Npm install --loglevel=error
+if ($nodePath.IsLocal) {
+    & $nodePath.Node $nodePath.Npm install --loglevel=error
+} else {
+    npm install --loglevel=error
+}
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Aviso: Falha ao instalar dependências do root" -ForegroundColor Yellow
 } else {
@@ -70,7 +74,11 @@ $hasConcurrently = Test-CommandExists "concurrently"
 if (-not $hasConcurrently) {
     # Tentar instalar globalmente
     Write-Host "Instalando concurrently globalmente..." -ForegroundColor Yellow
-    & $nodePath.Node $nodePath.Npm install -g concurrently --silent
+    if ($nodePath.IsLocal) {
+        & $nodePath.Node $nodePath.Npm install -g concurrently --silent
+    } else {
+        npm install -g concurrently --silent
+    }
     if ($LASTEXITCODE -eq 0) {
         Write-Host "✓ concurrently instalado!" -ForegroundColor Green
     } else {

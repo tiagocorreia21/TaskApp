@@ -66,7 +66,11 @@ if (-not (Test-Path $BackendPath)) {
 
 Set-Location $BackendPath
 Write-Host "Instalando dependências do backend..." -ForegroundColor Yellow
-npm install
+if ($nodePath.IsLocal) {
+    & $nodePath.Node $nodePath.Npm install
+} else {
+    npm install
+}
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERRO: Falha ao instalar dependências do backend!" -ForegroundColor Red
     Set-Location $OriginalLocation
@@ -131,7 +135,11 @@ if ($mongoExe) {
 Write-Host ""
 
 Write-Host "Compilando TypeScript do backend..." -ForegroundColor Yellow
-npm run build
+if ($nodePath.IsLocal) {
+    & $nodePath.Node $nodePath.Npm run build
+} else {
+    npm run build
+}
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERRO: Falha ao compilar o backend!" -ForegroundColor Red
     Set-Location $OriginalLocation
@@ -154,7 +162,11 @@ if (-not (Test-Path $FrontendPath)) {
 
 Set-Location $FrontendPath
 Write-Host "Instalando dependências do frontend..." -ForegroundColor Yellow
-& $nodePath.Node $nodePath.Npm install
+if ($nodePath.IsLocal) {
+    & $nodePath.Node $nodePath.Npm install
+} else {
+    npm install
+}
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERRO: Falha ao instalar dependências do frontend!" -ForegroundColor Red
     Set-Location $OriginalLocation
@@ -164,7 +176,11 @@ Write-Host "Dependências do frontend instaladas com sucesso!" -ForegroundColor 
 Write-Host ""
 
 Write-Host "Compilando frontend..." -ForegroundColor Yellow
-& $nodePath.Node $nodePath.Npm run build
+if ($nodePath.IsLocal) {
+    & $nodePath.Node $nodePath.Npm run build
+} else {
+    npm run build
+}
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERRO: Falha ao compilar o frontend!" -ForegroundColor Red
     Set-Location $OriginalLocation

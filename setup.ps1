@@ -37,13 +37,11 @@ Write-Host "[1/5] Verificando Node.js..." -ForegroundColor Yellow
 if (-not (Test-CommandExists "node")) {
     Write-Host "ERRO: Node.js não está instalado!" -ForegroundColor Red
     Write-Host ""
-    Write-Host "Por favor, instale Node.js de: https://nodejs.org/" -ForegroundColor Yellow
-    Write-Host "Recomendado: Node.js LTS (v18 ou superior)" -ForegroundColor Yellow
     exit 1
 }
 
 $nodeVersion = node --version
-Write-Host "✓ Node.js encontrado: $nodeVersion" -ForegroundColor Green
+Write-Host "Node.js encontrado: $nodeVersion" -ForegroundColor Green
 
 # Verificar npm
 Write-Host "[2/5] Verificando npm..." -ForegroundColor Yellow
@@ -53,17 +51,17 @@ if (-not (Test-CommandExists "npm")) {
 }
 
 $npmVersion = npm --version
-Write-Host "✓ npm encontrado: v$npmVersion" -ForegroundColor Green
+Write-Host "npm encontrado: v$npmVersion" -ForegroundColor Green
 
 
 # Instalar dependências do root
 Write-Host "[3/5] Instalando dependências globais do projeto..." -ForegroundColor Yellow
 Set-Location $ProjectRoot
-npm install --loglevel=error
+& $nodePath.Node $nodePath.Npm install --loglevel=error
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "⚠ Aviso: Falha ao instalar dependências do root" -ForegroundColor Yellow
+    Write-Host "Aviso: Falha ao instalar dependências do root" -ForegroundColor Yellow
 } else {
-    Write-Host "✓ Dependências globais instaladas!" -ForegroundColor Green
+    Write-Host "Dependências globais instaladas!" -ForegroundColor Green
 }
 
 # Verificar/Instalar concurrently
@@ -72,7 +70,7 @@ $hasConcurrently = Test-CommandExists "concurrently"
 if (-not $hasConcurrently) {
     # Tentar instalar globalmente
     Write-Host "Instalando concurrently globalmente..." -ForegroundColor Yellow
-    npm install -g concurrently --silent
+    & $nodePath.Node $nodePath.Npm install -g concurrently --silent
     if ($LASTEXITCODE -eq 0) {
         Write-Host "✓ concurrently instalado!" -ForegroundColor Green
     } else {
@@ -102,7 +100,6 @@ if ($LASTEXITCODE -ne 0) {
 # Voltar ao diretório original
 Set-Location $OriginalLocation
 
-# Sucesso!
 Write-Host ""
 Write-Host "╔════════════════════════════════════════╗" -ForegroundColor Green
 Write-Host "║   ✓ Setup Concluído com Sucesso!      ║" -ForegroundColor Green
@@ -113,15 +110,7 @@ Write-Host ""
 Write-Host "  Para iniciar a aplicação, execute:" -ForegroundColor White
 Write-Host "    .\start.ps1" -ForegroundColor Yellow
 Write-Host ""
-Write-Host "  Ou use npm:" -ForegroundColor White
-Write-Host "    npm run dev" -ForegroundColor Yellow
-Write-Host ""
-Write-Host "URLs da aplicação:" -ForegroundColor Cyan
-Write-Host "  • Frontend: http://localhost:5173" -ForegroundColor White
-Write-Host "  • Backend:  http://localhost:4000" -ForegroundColor White
-Write-Host ""
 Write-Host "Para mais informações, consulte:" -ForegroundColor Cyan
 Write-Host "  • README.md" -ForegroundColor White
-Write-Host "  • SCRIPTS_README.md" -ForegroundColor White
 Write-Host ""
-Write-Host ""
+

@@ -72,7 +72,7 @@ if ($LASTEXITCODE -ne 0) {
     Set-Location $OriginalLocation
     exit 1
 }
-Write-Host "✓ Dependências do backend instaladas com sucesso!" -ForegroundColor Green
+Write-Host "Dependências do backend instaladas com sucesso!" -ForegroundColor Green
 Write-Host ""
 
 # Verificar e preparar MongoDB Memory Server
@@ -89,7 +89,7 @@ if (-not (Test-Path $mongodbBinariesPath)) {
 $mongoExe = Get-ChildItem -Path $mongodbBinariesPath -Filter "mongod-*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
 
 if ($mongoExe) {
-    Write-Host "✓ MongoDB binário encontrado: $($mongoExe.Name)" -ForegroundColor Green
+    Write-Host "MongoDB binário encontrado: $($mongoExe.Name)" -ForegroundColor Green
 } else {
     Write-Host "  MongoDB binário não encontrado!" -ForegroundColor Yellow
 
@@ -120,7 +120,7 @@ if ($mongoExe) {
                 Write-Host "  A aplicação tentará baixar automaticamente na primeira execução" -ForegroundColor Gray
             }
         } else {
-            Write-Host "⚠ Script install-mongodb.ps1 não encontrado" -ForegroundColor Yellow
+            Write-Host "Script install-mongodb.ps1 não encontrado" -ForegroundColor Yellow
             Write-Host "  O MongoDB será baixado automaticamente na primeira execução" -ForegroundColor Gray
         }
     } else {
@@ -154,17 +154,17 @@ if (-not (Test-Path $FrontendPath)) {
 
 Set-Location $FrontendPath
 Write-Host "Instalando dependências do frontend..." -ForegroundColor Yellow
-npm install
+& $nodePath.Node $nodePath.Npm install
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERRO: Falha ao instalar dependências do frontend!" -ForegroundColor Red
     Set-Location $OriginalLocation
     exit 1
 }
-Write-Host "✓ Dependências do frontend instaladas com sucesso!" -ForegroundColor Green
+Write-Host "Dependências do frontend instaladas com sucesso!" -ForegroundColor Green
 Write-Host ""
 
 Write-Host "Compilando frontend..." -ForegroundColor Yellow
-npm run build
+& $nodePath.Node $nodePath.Npm run build
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERRO: Falha ao compilar o frontend!" -ForegroundColor Red
     Set-Location $OriginalLocation
@@ -179,6 +179,4 @@ Set-Location $OriginalLocation
 Write-Host "========================================" -ForegroundColor Green
 Write-Host "  Deploy concluído com sucesso!        " -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
-Write-Host ""
-Write-Host "Para executar a aplicação, use: .\run.ps1" -ForegroundColor Cyan
 Write-Host ""

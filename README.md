@@ -1,10 +1,10 @@
 ﻿# TaskApp
 
-Aplicação fullstack de gerenciamento de tarefas com Backend e Frontend.
+Aplicação fullstack de gestão de tarefas com Backend e Frontend.
 
 ---
 
-## Como usar?
+## 1. Como usar?
 
 1. Baixar o repositório e descompactar.
 
@@ -15,10 +15,11 @@ Aplicação fullstack de gerenciamento de tarefas com Backend e Frontend.
 3. Executar o script de intalação: 
 
 ```powershell
-.\setup.ps1
+.\setup.ps1 -AutoInstallMongoDB
 ```
 
-- Este scipt instala todas as dependências necessárias para o backend e frontend, preparando o ambiente para execução da aplicação.
+- Este scipt instala todas as dependências necessárias para o backend, frontend e base de dados preparando o ambiente para execução da aplicação.
+- Nota: Este procedimento pode demorar alguns minutos dependendo da velocidade da internet e do computador.
 
 4. Quando a instalação terminar, executar o script de para correr a aplicação:
 
@@ -26,19 +27,21 @@ Aplicação fullstack de gerenciamento de tarefas com Backend e Frontend.
 .\start.ps1
 ```
 
-5. A aplicação estará disponível em http://localhost:5173
+5. A aplicação estará disponível no link: http://localhost:5173
 
 ---
 
-## 📋 Pré-requisitos
+## 2. Pré-requisitos
 
-- [Node.js](https://nodejs.org/) v16 ou superior
+- [Node.js](https://nodejs.org/) v16 ou superior (ou será instalado automaticamente)
 - npm (incluso com Node.js)
 - PowerShell (Windows)
 
+**NOTA:** Se o Node.js não estiver instalado no sistema, o script de setup oferecerá a opção de instalar uma versão local do Node.js apenas para este projeto, sem afetar o sistema operacional.
+
 ---
 
-## 🌐 URLs da Aplicação
+## 3. URLs da Aplicação
 
 Após iniciar a aplicação:
 
@@ -47,158 +50,7 @@ Após iniciar a aplicação:
 
 ---
 
-## 📜 Scripts Disponíveis
-
-### setup.ps1
-Configuração inicial completa - instala dependências e compila o projeto.
-
-```powershell
-.\setup.ps1
-```
-
-Para instalar automaticamente o MongoDB sem prompt:
-
-```powershell
-.\setup.ps1 -AutoInstallMongoDB
-```
-
-### start.ps1
-
-Inicia o backend e frontend simultaneamente.
-
-```powershell
-.\start.ps1
-```
-
-### stop.ps1
-
-Para os servidores backend e frontend.
-
-```powershell
-.\stop.ps1
-```
-
-### deploy.ps1
-
-Instala dependências e compila backend e frontend.
-
-```powershell
-.\deploy.ps1
-```
-
-Para instalar automaticamente o MongoDB sem prompt:
-
-```powershell
-.\deploy.ps1 -AutoInstallMongoDB
-```
-
-### install-mongodb.ps1
-
-Baixa e instala o MongoDB Memory Server binários.
-
-```powershell
-.\install-mongodb.ps1
-```
-
-Este script:
-- Cria o diretório `backend/mongodb-binaries`
-- Baixa o MongoDB versão 6.0.12
-- Configura o MongoDB Memory Server.
-- Pode demorar alguns minutos na primeira execução
-
-### clean.ps1
-
-Remove todos os node_modules e arquivos compilados (build, dist).
-
-```powershell
-.\clean.ps1
-```
-
-### run.ps1
-
-Executa os servidores em modo de desenvolvimento.
-
-```powershell
-.\run.ps1
-```
-
----
-
-## 🐛 Resolução de Problemas
-
-### Porta já em uso
-
-```powershell
-# Libertar portas
-npx kill-port 4000 5173
-```
-
-### Dependências não instaladas
-
-```powershell
-.\deploy.ps1
-# ou
-npm run install:all
-```
-
-### Erro de política de execução (PowerShell)
-
-- Pode ser necessário ajustar a política de execução do PowerShell para permitir a execução dos scripts. 
-- Execute o seguinte comando no PowerShell:
-
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
-
-- Este comando permite a execução de scripts locais não assinados na sessão atual do usuário.
-
-### MongoDB não está instalado ou não baixa automaticamente
-
-Se o MongoDB Memory Server não foi baixado automaticamente:
-
-```powershell
-# Executar script de instalação manualmente
-.\install-mongodb.ps1
-```
-
-Ou instalar durante o setup/deploy:
-
-```powershell
-.\deploy.ps1 -AutoInstallMongoDB
-```
-
-**Nota:** O MongoDB Memory Server baixa na primeira execução e pode demorar alguns minutos dependendo da sua conexão com a internet.
-
-### Erro "MongooseError: The uri parameter to openUri() must be a string"
-
-Isso significa que o arquivo `.env` não existe ou está mal configurado. Para corrigir:
-
-1. Verifique se existe o arquivo `backend/.env`
-2. Se não existir, copie o exemplo:
-
-```powershell
-Copy-Item backend\.env.example backend\.env
-```
-
-3. Ou crie manualmente com o conteúdo:
-
-```env
-NODE_ENV=development
-PORT=4000
-USE_MEMORY_DB=true
-LOG_LEVEL=info
-```
-
-### Limpar e reinstalar tudo
-
-Para remover todos os node_modules e arquivos compilados:
-
-```powershell
-.\clean.ps1
-```
----
-
-## Tecnologias Utilizadas
+## 4. Tecnologias Utilizadas
 
 ### Backend
 
@@ -211,5 +63,27 @@ Para remover todos os node_modules e arquivos compilados:
 
 - React 19
 - Vite
+
+---
+
+## 5. Possíveis Problemas
+
+- Um coisa que pode acontecer é o terminal bloquear a execução de scripts por questões de segurança do PowerShell. 
+  Nesse caso, execute o seguinte comando no PowerShell para permitir a execução de scripts locais 
+  (somente para a sessão atual do terminal):
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+- Depois, tente executar novamente o script pretendido.
+
+- Para mais problemas comuns e suas soluções, consulte o arquivo [docs/POSSIBLE_PROBLEMS.md](docs/POSSIBLE_PROBLEMS.md).
+
+---
+
+## 6. Scripts Disponíveis
+
+- Para mais detalhes sobre os scripts disponíveis, consulte o arquivo [docs/SCRIPTS.md](docs/SCRIPTS.md).
 
 ---

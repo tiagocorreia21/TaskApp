@@ -44,6 +44,10 @@ desktop.ini
 mongodb-binaries/
 data/
 
+# Local Node.js installation
+nodejs-local/
+node-temp.zip
+
 # Test coverage
 coverage/
 .nyc_output/

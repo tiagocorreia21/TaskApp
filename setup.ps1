@@ -50,7 +50,7 @@ Write-Host "✓ npm encontrado: v$npmVersion" -ForegroundColor Green
 # Obter o diretório raiz do projeto
 $ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-# Instalar dependências do root (inclui concurrently)
+# Instalar dependências do root
 Write-Host "[3/5] Instalando dependências globais do projeto..." -ForegroundColor Yellow
 Set-Location $ProjectRoot
 npm install --loglevel=error

@@ -17,6 +17,11 @@ export default {
   port: parseInt(process.env.PORT, 10) || 4000,
 
   /**
+   * That long string from mlab
+   */
+  databaseURL: process.env.MONGODB_URI || 'mongodb://localhost:27017/taskapp',
+
+  /**
    * Use MongoDB in memory (for development/testing)
    * Set USE_MEMORY_DB=true in .env to enable
    */

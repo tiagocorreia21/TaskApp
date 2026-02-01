@@ -14,6 +14,48 @@ $ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $BackendPath = Join-Path $ProjectRoot "backend"
 $FrontendPath = Join-Path $ProjectRoot "frontend"
 
+# Função para obter o caminho do Node.js (sistema ou local)
+function Get-NodePath {
+    $localNodePath = Join-Path $ProjectRoot "nodejs-local"
+    $nodeExe = Get-ChildItem -Path $localNodePath -Filter "node.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+
+    if ($nodeExe) {
+        return @{
+            Node = $nodeExe.FullName
+            Npm = (Get-ChildItem -Path $localNodePath -Filter "npm.cmd" -Recurse | Select-Object -First 1).FullName
+            IsLocal = $true
+        }
+    } elseif ($null -ne (Get-Command node -ErrorAction SilentlyContinue)) {
+        return @{
+            Node = "node"
+            Npm = "npm"
+            IsLocal = $false
+        }
+    }
+
+    return $null
+}
+
+# Verificar Node.js
+Write-Host "Verificando Node.js..." -ForegroundColor Yellow
+$nodePath = Get-NodePath
+
+if (-not $nodePath) {
+    Write-Host "ERRO: Node.js não está instalado!" -ForegroundColor Red
+    Write-Host ""
+    Write-Host "Por favor, execute primeiro o setup:" -ForegroundColor Yellow
+    Write-Host "  .\setup.ps1" -ForegroundColor Cyan
+    Write-Host ""
+    exit 1
+}
+
+if ($nodePath.IsLocal) {
+    Write-Host "✓ Usando Node.js local" -ForegroundColor Green
+} else {
+    Write-Host "✓ Usando Node.js do sistema" -ForegroundColor Green
+}
+Write-Host ""
+
 # Verificar se as dependências foram instaladas
 if (-not (Test-Path (Join-Path $BackendPath "node_modules"))) {
     Write-Host "AVISO: Dependências do backend não instaladas!" -ForegroundColor Yellow

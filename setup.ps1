@@ -32,26 +32,95 @@ Write-Host "  ✓ Executar deploy completo" -ForegroundColor Gray
 Write-Host "  ✓ Preparar aplicação para uso" -ForegroundColor Gray
 Write-Host ""
 
-# Verificar Node.js
-Write-Host "[1/5] Verificando Node.js..." -ForegroundColor Yellow
-if (-not (Test-CommandExists "node")) {
-    Write-Host "ERRO: Node.js não está instalado!" -ForegroundColor Red
-    Write-Host ""
-    exit 1
+# Função para obter o caminho do Node.js (sistema ou local)
+function Get-NodePath {
+    $localNodePath = Join-Path $ProjectRoot "nodejs-local"
+    $nodeExe = Get-ChildItem -Path $localNodePath -Filter "node.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+
+    if ($nodeExe) {
+        return @{
+            Node = $nodeExe.FullName
+            Npm = (Get-ChildItem -Path $localNodePath -Filter "npm.cmd" -Recurse | Select-Object -First 1).FullName
+            IsLocal = $true
+        }
+    } elseif ($null -ne (Get-Command node -ErrorAction SilentlyContinue)) {
+        return @{
+            Node = "node"
+            Npm = "npm"
+            IsLocal = $false
+        }
+    }
+
+    return $null
 }
 
-$nodeVersion = node --version
-Write-Host "Node.js encontrado: $nodeVersion" -ForegroundColor Green
+# Verificar Node.js
+Write-Host "[1/5] Verificando Node.js..." -ForegroundColor Yellow
+
+$nodePath = Get-NodePath
+
+if (-not $nodePath) {
+    Write-Host "Node.js não está instalado!" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "Opções disponíveis:" -ForegroundColor Cyan
+    Write-Host "  1. Instalar Node.js localmente no projeto (recomendado)" -ForegroundColor White
+    Write-Host "  2. Instalar Node.js globalmente (https://nodejs.org/)" -ForegroundColor White
+    Write-Host "  3. Cancelar" -ForegroundColor White
+    Write-Host ""
+
+    $choice = Read-Host "Escolha uma opção (1-3)"
+
+    if ($choice -eq "1") {
+        Write-Host ""
+        Write-Host "Instalando Node.js localmente..." -ForegroundColor Yellow
+        & "$ProjectRoot\install-nodejs.ps1" -SkipConfirmation
+
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "ERRO: Falha ao instalar Node.js localmente!" -ForegroundColor Red
+            exit 1
+        }
+
+        # Verificar novamente após instalação
+        $nodePath = Get-NodePath
+        if (-not $nodePath) {
+            Write-Host "ERRO: Node.js não foi instalado corretamente!" -ForegroundColor Red
+            exit 1
+        }
+    } elseif ($choice -eq "2") {
+        Write-Host ""
+        Write-Host "Por favor, instale Node.js de https://nodejs.org/ e execute este script novamente." -ForegroundColor Yellow
+        Write-Host "Pressione qualquer tecla para abrir o site do Node.js..." -ForegroundColor Gray
+        $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+        Start-Process "https://nodejs.org/"
+        exit 1
+    } else {
+        Write-Host "Instalação cancelada pelo usuário." -ForegroundColor Yellow
+        exit 1
+    }
+}
+
+if ($nodePath.IsLocal) {
+    $nodeVersion = & $nodePath.Node --version
+    Write-Host "Node.js local encontrado: $nodeVersion" -ForegroundColor Green
+} else {
+    $nodeVersion = node --version
+    Write-Host "Node.js do sistema encontrado: $nodeVersion" -ForegroundColor Green
+}
 
 # Verificar npm
 Write-Host "[2/5] Verificando npm..." -ForegroundColor Yellow
-if (-not (Test-CommandExists "npm")) {
-    Write-Host "ERRO: npm não está instalado!" -ForegroundColor Red
-    exit 1
-}
 
-$npmVersion = npm --version
-Write-Host "npm encontrado: v$npmVersion" -ForegroundColor Green
+if ($nodePath.IsLocal) {
+    $npmVersion = & $nodePath.Node $nodePath.Npm --version
+    Write-Host "npm encontrado (local): v$npmVersion" -ForegroundColor Green
+} else {
+    if (-not (Test-CommandExists "npm")) {
+        Write-Host "ERRO: npm não está instalado!" -ForegroundColor Red
+        exit 1
+    }
+    $npmVersion = npm --version
+    Write-Host "npm encontrado: v$npmVersion" -ForegroundColor Green
+}
 
 
 # Instalar dependências do root

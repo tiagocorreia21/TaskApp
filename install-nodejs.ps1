@@ -3,7 +3,8 @@
 # Script to install Node.js locally in the project
 
 param(
-    [string]$NodeVersion = "20.11.0"
+    [string]$NodeVersion = "20.11.0",
+    [switch]$SkipConfirmation = $false
 )
 
 Write-Host ""
@@ -36,14 +37,20 @@ if (Test-Path $NodeLocalPath) {
     if ($nodeExe) {
         $localNodeVersion = & $nodeExe.FullName --version
         Write-Host "Versão instalada: $localNodeVersion" -ForegroundColor Green
-        Write-Host ""
-        $response = Read-Host "Deseja reinstalar? (S/N)"
-        if ($response -ne "S" -and $response -ne "s") {
-            Write-Host "Instalação cancelada." -ForegroundColor Yellow
+
+        if (-not $SkipConfirmation) {
+            Write-Host ""
+            $response = Read-Host "Deseja reinstalar? (S/N)"
+            if ($response -ne "S" -and $response -ne "s") {
+                Write-Host "Instalação cancelada." -ForegroundColor Yellow
+                exit 0
+            }
+            Write-Host "Removendo instalação anterior..." -ForegroundColor Yellow
+            Remove-Item -Path $NodeLocalPath -Recurse -Force
+        } else {
+            Write-Host "✓ Node.js local já disponível (pulando reinstalação)" -ForegroundColor Green
             exit 0
         }
-        Write-Host "Removendo instalação anterior..." -ForegroundColor Yellow
-        Remove-Item -Path $NodeLocalPath -Recurse -Force
     }
 }
 

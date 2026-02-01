@@ -36,8 +36,45 @@ function Get-NodePath {
 $nodePath = Get-NodePath
 if (-not $nodePath) {
     Write-Host "ERRO: Node.js não está instalado!" -ForegroundColor Red
-    Write-Host "Execute primeiro: .\setup.ps1" -ForegroundColor Yellow
-    exit 1
+    Write-Host ""
+    Write-Host "Opções disponíveis:" -ForegroundColor Cyan
+    Write-Host "  1. Instalar Node.js localmente no projeto (recomendado)" -ForegroundColor White
+    Write-Host "  2. Executar setup completo (recomendado para primeira vez)" -ForegroundColor White
+    Write-Host "  3. Cancelar" -ForegroundColor White
+    Write-Host ""
+
+    $choice = Read-Host "Escolha uma opção (1-3)"
+
+    if ($choice -eq "1") {
+        Write-Host ""
+        Write-Host "Instalando Node.js localmente..." -ForegroundColor Yellow
+        & "$ProjectRoot\install-nodejs.ps1" -SkipConfirmation
+
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "ERRO: Falha ao instalar Node.js localmente!" -ForegroundColor Red
+            exit 1
+        }
+
+        # Verificar novamente após instalação
+        $nodePath = Get-NodePath
+        if (-not $nodePath) {
+            Write-Host "ERRO: Node.js não foi instalado corretamente!" -ForegroundColor Red
+            exit 1
+        }
+
+        Write-Host ""
+        Write-Host "Node.js instalado! Agora execute o setup:" -ForegroundColor Green
+        Write-Host "  .\setup.ps1" -ForegroundColor Yellow
+        exit 0
+    } elseif ($choice -eq "2") {
+        Write-Host ""
+        Write-Host "Executando setup completo..." -ForegroundColor Yellow
+        & "$ProjectRoot\setup.ps1"
+        exit $LASTEXITCODE
+    } else {
+        Write-Host "Operação cancelada pelo usuário." -ForegroundColor Yellow
+        exit 1
+    }
 }
 
 # Verificar se concurrently está instalado globalmente

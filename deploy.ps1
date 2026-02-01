@@ -24,30 +24,94 @@ function Test-CommandExists {
     return $exists
 }
 
+# Função para obter o caminho do Node.js (sistema ou local)
+function Get-NodePath {
+    $localNodePath = Join-Path $ProjectRoot "nodejs-local"
+    $nodeExe = Get-ChildItem -Path $localNodePath -Filter "node.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+
+    if ($nodeExe) {
+        return @{
+            Node = $nodeExe.FullName
+            Npm = (Get-ChildItem -Path $localNodePath -Filter "npm.cmd" -Recurse | Select-Object -First 1).FullName
+            IsLocal = $true
+        }
+    } elseif ($null -ne (Get-Command node -ErrorAction SilentlyContinue)) {
+        return @{
+            Node = "node"
+            Npm = "npm"
+            IsLocal = $false
+        }
+    }
+
+    return $null
+}
+
 # Verificar se Node.js está instalado
 Write-Host "Verificando pré-requisitos..." -ForegroundColor Yellow
-if (-not (Test-CommandExists "node")) {
-    Write-Host "ERRO: Node.js não está instalado!" -ForegroundColor Red
-    Write-Host "Por favor, instale Node.js de https://nodejs.org/" -ForegroundColor Red
-    exit 1
+
+$nodePath = Get-NodePath
+
+if (-not $nodePath) {
+    Write-Host "Node.js não está instalado!" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "Opções disponíveis:" -ForegroundColor Cyan
+    Write-Host "  1. Instalar Node.js localmente no projeto (recomendado)" -ForegroundColor White
+    Write-Host "  2. Instalar Node.js globalmente (https://nodejs.org/)" -ForegroundColor White
+    Write-Host "  3. Cancelar" -ForegroundColor White
+    Write-Host ""
+
+    $choice = Read-Host "Escolha uma opção (1-3)"
+
+    if ($choice -eq "1") {
+        Write-Host ""
+        Write-Host "Instalando Node.js localmente..." -ForegroundColor Yellow
+        & "$ProjectRoot\install-nodejs.ps1" -SkipConfirmation
+
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "ERRO: Falha ao instalar Node.js localmente!" -ForegroundColor Red
+            exit 1
+        }
+
+        # Verificar novamente após instalação
+        $nodePath = Get-NodePath
+        if (-not $nodePath) {
+            Write-Host "ERRO: Node.js não foi instalado corretamente!" -ForegroundColor Red
+            exit 1
+        }
+    } elseif ($choice -eq "2") {
+        Write-Host ""
+        Write-Host "Por favor, instale Node.js de https://nodejs.org/ e execute este script novamente." -ForegroundColor Yellow
+        Write-Host "Pressione qualquer tecla para abrir o site do Node.js..." -ForegroundColor Gray
+        $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+        Start-Process "https://nodejs.org/"
+        exit 1
+    } else {
+        Write-Host "Deploy cancelado pelo usuário." -ForegroundColor Yellow
+        exit 1
+    }
 }
 
-if (-not (Test-CommandExists "npm")) {
-    Write-Host "ERRO: npm não está instalado!" -ForegroundColor Red
-    exit 1
+if ($nodePath.IsLocal) {
+    $nodeVersion = & $nodePath.Node --version
+    $npmVersion = & $nodePath.Node $nodePath.Npm --version
+    Write-Host "✓ Node.js local encontrado: $nodeVersion" -ForegroundColor Green
+    Write-Host "✓ npm encontrado: $npmVersion" -ForegroundColor Green
+} else {
+    if (-not (Test-CommandExists "npm")) {
+        Write-Host "ERRO: npm não está instalado!" -ForegroundColor Red
+        exit 1
+    }
+    $nodeVersion = node --version
+    $npmVersion = npm --version
+    Write-Host "✓ Node.js encontrado: $nodeVersion" -ForegroundColor Green
+    Write-Host "✓ npm encontrado: $npmVersion" -ForegroundColor Green
+
+    # Obter o caminho do Node.js e adicionar ao PATH para garantir que cmd.exe encontre
+    $nodePathBin = (Get-Command node).Source
+    $nodeDir = Split-Path -Parent $nodePathBin
+    Write-Host "Configurando PATH do Node.js: $nodeDir" -ForegroundColor Yellow
+    $env:PATH = "$nodeDir;$env:PATH"
 }
-
-$nodeVersion = node --version
-$npmVersion = npm --version
-Write-Host "✓ Node.js encontrado: $nodeVersion" -ForegroundColor Green
-Write-Host "✓ npm encontrado: $npmVersion" -ForegroundColor Green
-Write-Host ""
-
-# Obter o caminho do Node.js e adicionar ao PATH para garantir que cmd.exe encontre
-$nodePath = (Get-Command node).Source
-$nodeDir = Split-Path -Parent $nodePath
-Write-Host "Configurando PATH do Node.js: $nodeDir" -ForegroundColor Yellow
-$env:PATH = "$nodeDir;$env:PATH"
 Write-Host ""
 
 $BackendPath = Join-Path $ProjectRoot "backend"

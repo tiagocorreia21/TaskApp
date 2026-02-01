@@ -4,7 +4,15 @@ Aplicação fullstack de gestão de tarefas com Backend e Frontend.
 
 ---
 
-## 1. Como usar?
+## 1. Pré-requisitos
+
+- [Node.js](https://nodejs.org/) v16 ou superior
+- npm (incluso com Node.js)
+- PowerShell (Windows)
+
+---
+
+## 2. Como usar?
 
 1. Baixar o repositório e descompactar.
 
@@ -28,16 +36,6 @@ Aplicação fullstack de gestão de tarefas com Backend e Frontend.
 ```
 
 5. A aplicação estará disponível no link: http://localhost:5173
-
----
-
-## 2. Pré-requisitos
-
-- [Node.js](https://nodejs.org/) v16 ou superior (ou será instalado automaticamente)
-- npm (incluso com Node.js)
-- PowerShell (Windows)
-
-**NOTA:** Se o Node.js não estiver instalado no sistema, o script de setup oferecerá a opção de instalar uma versão local do Node.js apenas para este projeto, sem afetar o sistema operacional.
 
 ---
 

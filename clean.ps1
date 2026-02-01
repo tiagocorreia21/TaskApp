@@ -15,16 +15,6 @@ Write-Host ""
 # Obter o diretório raiz do projeto
 $ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-# Verificar se existe instalação local do Node.js
-$localNodePath = Join-Path $ProjectRoot "nodejs-local"
-$removeNodeJs = $false
-if (Test-Path $localNodePath) {
-    Write-Host "AVISO: Instalação local do Node.js detectada!" -ForegroundColor Yellow
-    Write-Host "Deseja também remover a instalação local do Node.js? (s/N)" -ForegroundColor Yellow
-    $response = Read-Host
-    $removeNodeJs = ($response -eq "s" -or $response -eq "S")
-    Write-Host ""
-}
 
 # Função para remover diretório com mensagem
 function Remove-DirectoryWithMessage {
@@ -97,15 +87,6 @@ Remove-FileWithMessage -Path (Join-Path $ProjectRoot "package-lock.json") -Descr
 Remove-FileWithMessage -Path (Join-Path $ProjectRoot "backend\package-lock.json") -Description "package-lock.json (backend)"
 Remove-FileWithMessage -Path (Join-Path $ProjectRoot "frontend\package-lock.json") -Description "package-lock.json (frontend)"
 
-# Remover instalação local do Node.js se solicitado
-if ($removeNodeJs) {
-    Write-Host ""
-    Write-Host "========================================" -ForegroundColor Cyan
-    Write-Host "  Removendo Node.js local" -ForegroundColor Cyan
-    Write-Host "========================================" -ForegroundColor Cyan
-    Write-Host ""
-    Remove-DirectoryWithMessage -Path $localNodePath -Description "nodejs-local"
-}
 
 Write-Host ""
 Write-Host "╔════════════════════════════════════════╗" -ForegroundColor Green

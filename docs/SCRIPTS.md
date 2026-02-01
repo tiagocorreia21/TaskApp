@@ -57,26 +57,6 @@ Este script:
 - Configura o MongoDB Memory Server.
 - Pode demorar alguns minutos na primeira execução
 
-### install-nodejs.ps1
-
-Baixa e instala o Node.js localmente no projeto (sem afetar o sistema).
-
-```powershell
-.\install-nodejs.ps1
-```
-
-Este script:
-- Baixa o Node.js versão 20.11.0 (LTS)
-- Instala na pasta `nodejs-local` do projeto
-- É executado automaticamente pelo `setup.ps1` se o Node.js não estiver instalado
-- Permite usar a aplicação sem instalar Node.js no sistema
-
-**Uso manual:**
-```powershell
-# Instalar versão específica
-.\install-nodejs.ps1 -NodeVersion "20.11.0"
-```
-
 ### clean.ps1
 
 Remove todos os node_modules e arquivos compilados (build, dist).

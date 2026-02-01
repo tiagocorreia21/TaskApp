@@ -59,6 +59,13 @@ if (-not (Test-CommandExists "npm")) {
 $npmVersion = npm --version
 Write-Host "npm encontrado: v$npmVersion" -ForegroundColor Green
 
+# Adicionar Node.js ao PATH para garantir que cmd.exe também encontre
+$nodeCommand = Get-Command node -ErrorAction SilentlyContinue
+if ($nodeCommand) {
+    $nodeDir = Split-Path -Parent $nodeCommand.Source
+    $env:PATH = "$nodeDir;$env:PATH"
+    Write-Host "✓ Node.js adicionado ao PATH para scripts" -ForegroundColor Green
+}
 
 # Instalar dependências do root
 Write-Host "[3/5] Instalando dependências globais do projeto..." -ForegroundColor Yellow

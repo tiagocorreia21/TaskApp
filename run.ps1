@@ -27,6 +27,14 @@ if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
 }
 
 Write-Host "✓ Node.js encontrado" -ForegroundColor Green
+
+# Adicionar Node.js ao PATH para garantir que cmd.exe também encontre
+$nodeCommand = Get-Command node -ErrorAction SilentlyContinue
+if ($nodeCommand) {
+    $nodeDir = Split-Path -Parent $nodeCommand.Source
+    $env:PATH = "$nodeDir;$env:PATH"
+}
+
 Write-Host ""
 
 # Verificar se as dependências foram instaladas

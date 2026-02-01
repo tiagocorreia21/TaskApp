@@ -3,7 +3,7 @@
 # Script to install Node.js locally in the project
 
 param(
-    [string]$NodeVersion = "20.11.0",
+    [string]$NodeVersion = "20.20.0",
     [switch]$SkipConfirmation = $false
 )
 
